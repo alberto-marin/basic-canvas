@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>PaintApp!</title>
+  <style>
+    * { margin: 0;
+      padding: 0;
+      box-sizing: border-box; }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      margin: 10px;
+    }
+    canvas {
+      border: 5px double black;
+      cursor: crosshair; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PaintApp!</h1>
+  </header>
+  <section id="controls">
+    <div>
+      <label for="line">Line:</label>
+      <select name="line" id="line" onchange="handleUpdate()">
+        <option value="round" checked>round</option>
+        <option value="square">square</option>
+      </select>
+    </div>
+    <div>
+      <label for="line--width">Line Width:</label>
+      <input type="range" name="line--width" value="10" min="10" max="25">
+    </div>
+    <div>
+      <label for="base-color">Color</label>
+      <input type="color" name="base-color" value="#FFFF00">
+    </div>
+  </section>
+  <canvas id="draw" width="320" height="480"></canvas>
+  <script>
+    const canvas = document.getElementById('draw');
+    const ctx = canvas.getContext('2d');
+    const inputs = document.querySelectorAll('input');
+
+
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    // canvas.width = window.innerWidth;
+    // canvas.height = window.innerHeight;
+    // Default settings
+    ctx.strokeStyle = '#FFFF00';
+    // ctx.lineJoin = 'round';
+    // ctx.lineCap = 'round';
+    ctx.lineWidth = '10';
+
+    function handleUpdate() {
+      const option = document.querySelector('select').value;
+      ctx.lineCap = option;
+      ctx.strokeStyle = this.value;
+      ctx.lineWidth = this.value;
+      console.log(option);
+    }
+
+    function draw(e) {
+      if (!isDrawing)  return;
+      //console.log(e);
+
+      ctx.beginPath();
+      // Start from
+      ctx.moveTo(lastX, lastY);
+      // Go to
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+      [lastX, lastY] = [e.offsetX, e.offsetY];
+    }
+
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      [lastX, lastY] = [e.offsetX, e.offsetY];
+    } );
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+
+    inputs.forEach(input => input.addEventListener('change', handleUpdate));
+    inputs.forEach(input => input.addEventListener('mousemove', handleUpdate));
+
+  </script>
+</body>
+</html>
