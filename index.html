@@ -9,21 +9,25 @@
     * { margin: 0;
       padding: 0;
       box-sizing: border-box; }
-    body {
+    /*body {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: flex-start;
       padding: 10px;
       margin: 10px;
-    }
+    }*/
     canvas {
       border: 5px double black;
-      cursor: crosshair; }
+      width: 100vw;
+      height: 100vh;
+      cursor: crosshair;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body>
-  <header>
+  <!-- <header>
     <h1>PaintApp!</h1>
   </header>
   <section id="controls">
@@ -42,58 +46,112 @@
       <label for="base-color">Color</label>
       <input type="color" name="base-color" value="#FFFF00">
     </div>
-  </section>
+  </section> -->
   <canvas id="draw" width="320" height="480"></canvas>
   <script>
-    const canvas = document.getElementById('draw');
-    const ctx = canvas.getContext('2d');
-    const inputs = document.querySelectorAll('input');
+  const canvas = document.querySelector('#draw');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+ctx.strokeStyle = '#BADA55';
+ctx.lineJoin = 'round';
+ctx.lineCap = 'round';
+ctx.lineWidth = 100;
+// ctx.globalCompositeOperation = 'multiply';
+
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let hue = 0;
+let direction = true;
+
+function draw(e) {
+  if (!isDrawing) return; // stop the fn from running when they are not moused down
+  console.log(e);
+  ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+  ctx.beginPath();
+  // start from
+  ctx.moveTo(lastX, lastY);
+  // go to
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+  [lastX, lastY] = [e.offsetX, e.offsetY];
+
+  hue++;
+  if (hue >= 360) {
+    hue = 0;
+  }
+  if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+    direction = !direction;
+  }
+
+  if(direction) {
+    ctx.lineWidth++;
+  } else {
+    ctx.lineWidth--;
+  }
+
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  isDrawing = true;
+  [lastX, lastY] = [e.offsetX, e.offsetY];
+});
 
 
-    let isDrawing = false;
-    let lastX = 0;
-    let lastY = 0;
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', () => isDrawing = false);
 
-    // canvas.width = window.innerWidth;
-    // canvas.height = window.innerHeight;
-    // Default settings
-    ctx.strokeStyle = '#FFFF00';
-    // ctx.lineJoin = 'round';
-    // ctx.lineCap = 'round';
-    ctx.lineWidth = '10';
-
-    function handleUpdate() {
-      const option = document.querySelector('select').value;
-      ctx.lineCap = option;
-      ctx.strokeStyle = this.value;
-      ctx.lineWidth = this.value;
-      console.log(option);
-    }
-
-    function draw(e) {
-      if (!isDrawing)  return;
-      //console.log(e);
-
-      ctx.beginPath();
-      // Start from
-      ctx.moveTo(lastX, lastY);
-      // Go to
-      ctx.lineTo(e.offsetX, e.offsetY);
-      ctx.stroke();
-      [lastX, lastY] = [e.offsetX, e.offsetY];
-    }
-
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mousedown', (e) => {
-      isDrawing = true;
-      [lastX, lastY] = [e.offsetX, e.offsetY];
-    } );
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseout', () => isDrawing = false);
-
-    inputs.forEach(input => input.addEventListener('change', handleUpdate));
-    inputs.forEach(input => input.addEventListener('mousemove', handleUpdate));
-
+// personal version
+// canvas.addEventListener('mouseout', () => isDrawing = false);
+//     const canvas = document.getElementById('draw');
+//     const ctx = canvas.getContext('2d');
+//     const inputs = document.querySelectorAll('input');
+//
+//
+//     let isDrawing = false;
+//     let lastX = 0;
+//     let lastY = 0;
+//
+//     // canvas.width = window.innerWidth;
+//     // canvas.height = window.innerHeight;
+//     // Default settings
+//     ctx.strokeStyle = '#FFFF00';
+//     // ctx.lineJoin = 'round';
+//     // ctx.lineCap = 'round';
+//     ctx.lineWidth = '10';
+//
+//     function handleUpdate() {
+//       const option = document.querySelector('select').value;
+//       ctx.lineCap = option;
+//       ctx.strokeStyle = this.value;
+//       ctx.lineWidth = this.value;
+//       console.log(option);
+//     }
+//
+//     function draw(e) {
+//       if (!isDrawing)  return;
+//       //console.log(e);
+//
+//       ctx.beginPath();
+//       // Start from
+//       ctx.moveTo(lastX, lastY);
+//       // Go to
+//       ctx.lineTo(e.offsetX, e.offsetY);
+//       ctx.stroke();
+//       [lastX, lastY] = [e.offsetX, e.offsetY];
+//     }
+//
+//     canvas.addEventListener('mousemove', draw);
+//     canvas.addEventListener('mousedown', (e) => {
+//       isDrawing = true;
+//       [lastX, lastY] = [e.offsetX, e.offsetY];
+//     } );
+//     canvas.addEventListener('mouseup', () => isDrawing = false);
+//     canvas.addEventListener('mouseout', () => isDrawing = false);
+//
+//     inputs.forEach(input => input.addEventListener('change', handleUpdate));
+//     inputs.forEach(input => input.addEventListener('mousemove', handleUpdate));
   </script>
 </body>
 </html>
